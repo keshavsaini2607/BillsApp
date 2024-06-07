@@ -1,9 +1,9 @@
 import 'react-native-gesture-handler';
 import React from 'react'
-import { Button, ColorMode, NativeBaseProvider, StorageManager, extendTheme } from 'native-base';
-import RootRouter from './auth/router/rootRouter';
+import { ColorMode, NativeBaseProvider, StorageManager } from 'native-base';
 import { NavigationContainer } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import RootRouter from './src/router/rootRouter';
 
 const colorModeManager: StorageManager = {
   get: async () => {

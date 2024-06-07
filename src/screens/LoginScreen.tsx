@@ -2,17 +2,12 @@ import React, { useState } from 'react'
 import { Box, Button, Divider, Flex, FormControl, Heading, Input, Spacer, Stack, Text } from 'native-base'
 import Icon from 'react-native-vector-icons/AntDesign'
 
-const LoginScreen = () => {
+const LoginScreen = ({ navigation }: any) => {
   const [showPassword, setShowPassword] = useState(false);
   return (
     <Box padding={4}>
       <Flex mb={10} direction='row' align='center' justify='space-between'>
-        <Box style={{ borderWidth: 1, width: 40, height: 40, justifyContent: 'center', alignItems: 'center', borderRadius: 40 }} borderColor={'gray.500'}>
-          <Icon
-            name="left"
-            size={20}
-          />
-        </Box>
+        <Text></Text>
         <Heading>Login</Heading>
         <Text></Text>
       </Flex>
@@ -48,11 +43,11 @@ const LoginScreen = () => {
         </Stack>
       </FormControl>
       <Stack space={3} mt={10}>
-        <Text alignSelf={'center'}>Don't have an account? <Text color={'blue.700'} fontWeight={600}>Register</Text></Text>
+        <Text alignSelf={'center'}>Don't have an account? <Text color={'blue.700'} fontWeight={600} onPress={() => navigation.navigate('Register')}>Register</Text></Text>
         <Text alignSelf={'center'}>Or Continue With</Text>
         <Divider />
         <Box alignSelf={'center'} style={{ borderWidth: 1, width: 40, height: 40, justifyContent: 'center', alignItems: 'center', borderRadius: 40 }} borderColor={'gray.500'}>
-          <Icon name="google" size={20} />        
+          <Icon name="google" size={20} />
         </Box>
       </Stack>
     </Box>
