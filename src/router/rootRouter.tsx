@@ -1,11 +1,9 @@
-import React from 'react'
+import React from 'react';
 import AuthStack from '../../src/router/authStack';
-
+import HomeTabs from './homeTabs';
 
 const RootRouter = () => {
-  return (
-    <AuthStack />
-  )
-}
+  return <HomeTabs />;
+};
 
-export default RootRouter
+export default RootRouter;
