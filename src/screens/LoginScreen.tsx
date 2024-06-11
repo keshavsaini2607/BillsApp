@@ -13,9 +13,34 @@ import {
   Text,
 } from 'native-base';
 import Icon from 'react-native-vector-icons/AntDesign';
+import auth from '@react-native-firebase/auth';
+
+interface LoginForm {
+  email: string;
+  password: string;
+}
 
 const LoginScreen = ({navigation}: any) => {
   const [showPassword, setShowPassword] = useState(false);
+  const [formValues, setFormValues] = useState<LoginForm>({
+    email: '',
+    password: '',
+  });
+
+  const handleLogin = () => {
+    try {
+      const {email, password} = formValues;
+      auth()
+        .signInWithEmailAndPassword(email, password)
+        .then(() => {
+          console.log('User signed in succesfully');
+        })
+        .catch(err => console.log('error signing up', err));
+    } catch (error) {
+      console.log({error});
+    }
+  };
+
   return (
     <Box padding={4}>
       <Flex mb={10} direction="row" align="center" justify="space-between">
@@ -29,7 +54,11 @@ const LoginScreen = ({navigation}: any) => {
         <Stack space={2}>
           <Stack>
             <FormControl.Label>Email</FormControl.Label>
-            <Input type="text" placeholder="Enter your email address" />
+            <Input
+              type="text"
+              placeholder="Enter your email address"
+              onChangeText={text => setFormValues(p => ({...p, email: text}))}
+            />
           </Stack>
           <Spacer />
           <Stack>
@@ -37,6 +66,9 @@ const LoginScreen = ({navigation}: any) => {
             <Input
               type={showPassword ? 'text' : 'password'}
               placeholder="Enter your password"
+              onChangeText={text =>
+                setFormValues(p => ({...p, password: text}))
+              }
               rightElement={
                 <Icon
                   name={showPassword ? 'eye' : 'eyeo'}
@@ -55,7 +87,7 @@ const LoginScreen = ({navigation}: any) => {
             </Flex>
           </Stack>
           <Stack mt={5}>
-            <Button>Login</Button>
+            <Button onPress={handleLogin}>Login</Button>
           </Stack>
         </Stack>
       </FormControl>
