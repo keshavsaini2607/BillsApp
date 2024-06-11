@@ -1,12 +1,20 @@
 import React from 'react';
-import {Box, Flex, Heading, ScrollView, Stack, Text} from 'native-base';
+import {
+  Box,
+  Flex,
+  Heading,
+  Pressable,
+  ScrollView,
+  Stack,
+  Text,
+} from 'native-base';
 import HomeHeader from '../components/HomeHeader';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {StyleSheet} from 'react-native';
 import BillCard from '../components/BillCard';
 import TransactionCard from '../components/TransactionCard';
 
-const HomeScreen = () => {
+const HomeScreen = ({navigation}) => {
   return (
     <Box padding={3} backgroundColor={'white'} flex={1}>
       <HomeHeader />
@@ -38,9 +46,11 @@ const HomeScreen = () => {
         <Text fontSize={18} fontWeight={500}>
           Bills This Month
         </Text>
-        <Text fontSize={15} fontWeight={500} color={'#0175FF'}>
-          Add New +
-        </Text>
+        <Pressable onPress={() => navigation.navigate('AddBill')}>
+          <Text fontSize={15} fontWeight={500} color={'#0175FF'}>
+            Add New +
+          </Text>
+        </Pressable>
       </Flex>
       <Stack>
         <ScrollView

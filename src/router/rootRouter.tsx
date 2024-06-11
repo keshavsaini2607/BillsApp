@@ -1,15 +1,16 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import AuthStack from '../../src/router/authStack';
 import HomeTabs from './homeTabs';
 import auth from '@react-native-firebase/auth';
-import {View, ActivityIndicator, Alert} from 'react-native';
+import {View, ActivityIndicator} from 'react-native';
+import AuthContext from '../context/AuthContext';
 
 const RootRouter = () => {
+  const {setUser, user} = useContext(AuthContext);
   const [initializing, setInitializing] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState(null);
 
-  const onAuthStateChanged = user => {
+  const onAuthStateChanged = (user: any) => {
     setUser(user);
     setIsLoggedIn(!!user);
 

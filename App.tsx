@@ -1,9 +1,10 @@
 import 'react-native-gesture-handler';
-import React from 'react'
-import { ColorMode, NativeBaseProvider, StorageManager } from 'native-base';
-import { NavigationContainer } from '@react-navigation/native';
+import React, {useState} from 'react';
+import {ColorMode, NativeBaseProvider, StorageManager} from 'native-base';
+import {NavigationContainer} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RootRouter from './src/router/rootRouter';
+import AuthContext from './src/context/AuthContext';
 
 const colorModeManager: StorageManager = {
   get: async () => {
@@ -23,15 +24,17 @@ const colorModeManager: StorageManager = {
   },
 };
 
-
 const App = () => {
+  const [user, setUser] = useState({});
   return (
     <NavigationContainer>
       <NativeBaseProvider colorModeManager={colorModeManager}>
-        <RootRouter />
+        <AuthContext.Provider value={{user, setUser}}>
+          <RootRouter />
+        </AuthContext.Provider>
       </NativeBaseProvider>
     </NavigationContainer>
-  )
-}
+  );
+};
 
-export default App
+export default App;
