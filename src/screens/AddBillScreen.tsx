@@ -8,12 +8,14 @@ import {
   Heading,
   Stack,
   Text,
+  Select,
 } from 'native-base';
 import Icon from 'react-native-vector-icons/AntDesign';
-import {Select} from 'native-base';
+import MatIcon from 'react-native-vector-icons/MaterialIcons';
 import BaseModal from '../components/BaseModal';
 import AddItem from '../components/Modals/AddItem';
 import AuthContext from '../context/AuthContext';
+import {FlatList} from 'react-native';
 
 interface FormValues {
   client: string;
@@ -22,7 +24,7 @@ interface FormValues {
 
 const AddBillScreen = ({navigation}: any) => {
   const {user} = useContext(AuthContext);
-  console.log({user})
+  console.log({user});
   const [formValues, setFormValues] = useState<FormValues>({
     client: '',
     orderItems: [],
@@ -44,6 +46,62 @@ const AddBillScreen = ({navigation}: any) => {
     console.log('values===>', values);
   };
 
+  const renderItem = ({item, index}: {item: any; index: number}) => (
+    <Flex
+      flexDirection={'row'}
+      justifyContent={'space-between'}
+      alignItems={'center'}
+      borderWidth={1}
+      p={2}
+      borderColor={'gray.300'}
+      borderRadius={5}
+      mb={2}>
+      <Stack>
+        <Flex
+          width={'full'}
+          flexDirection={'row'}
+          alignItems={'center'}
+          justifyContent={'space-between'}>
+          <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
+            <Icon name="shoppingcart" size={20} />
+            <Stack>
+              <Text fontSize={'xs'} fontWeight={'bold'}>
+                Name of item
+              </Text>
+              <Text fontSize={'xs'}>{item?.itemName}</Text>
+            </Stack>
+          </Flex>
+          <Icon name="right" size={20} />
+        </Flex>
+        <Flex
+          width={'90%'}
+          flexDirection={'row'}
+          alignItems={'center'}
+          justifyContent={'space-between'}
+          mt={2}>
+          <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
+            <MatIcon name="numbers" size={20} />
+            <Stack>
+              <Text fontSize={'xs'} fontWeight={'bold'}>
+                Number of items
+              </Text>
+              <Text fontSize={'xs'}>{item?.itemQuantity}</Text>
+            </Stack>
+          </Flex>
+          <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
+            <MatIcon name="price-check" size={20} />
+            <Stack>
+              <Text fontSize={'xs'} fontWeight={'bold'}>
+                Price per item
+              </Text>
+              <Text fontSize={'xs'}>{item?.itemPrice}</Text>
+            </Stack>
+          </Flex>
+        </Flex>
+      </Stack>
+    </Flex>
+  );
+
   return (
     <Box flex={1} background={'white'} p={4}>
       <Flex mb={10} direction="row" align="center" justify="space-between">
@@ -62,7 +120,7 @@ const AddBillScreen = ({navigation}: any) => {
         <Heading>Add New Bill</Heading>
         <Text></Text>
       </Flex>
-      <FormControl>
+      <FormControl flex={1}>
         <Stack>
           <FormControl.Label>Select Client</FormControl.Label>
           <Box>
@@ -91,33 +149,17 @@ const AddBillScreen = ({navigation}: any) => {
             Add Item +
           </Button>
         </Stack>
-        <Stack mt={3}>
+        <Stack mt={3} flex={1}>
           <FormControl.Label>Order Items</FormControl.Label>
-          <Flex gap={4}>
-            {formValues?.orderItems?.map((orderItem, idx) => (
-              <Flex
-                key={idx}
-                flexDirection={'row'}
-                justifyContent={'space-between'}
-                alignItems={'center'}
-                borderWidth={1}
-                p={2}
-                borderColor={'gray.300'}
-                borderRadius={5}>
-                <Text fontSize={'lg'}>{orderItem?.itemName}</Text>
-                <Flex>
-                  <Text fontSize={'xs'} color={'gray.400'}>
-                    (Price Per Piece * Number of Items)
-                  </Text>
-                  <Flex flexDirection={'row'}>
-                    <Text>{orderItem?.itemPrice}</Text>*
-                    <Text>{orderItem?.itemQuantity}</Text>
-                  </Flex>
-                </Flex>
-              </Flex>
-            ))}
-          </Flex>
+          <FlatList
+            data={formValues.orderItems}
+            renderItem={renderItem}
+            contentContainerStyle={{paddingBottom: 40}}
+            showsVerticalScrollIndicator={false}
+            keyExtractor={(item, index) => index.toString()}
+          />
         </Stack>
+        <Button>Save Order</Button>
       </FormControl>
       <BaseModal
         isOpen={showAddItem}

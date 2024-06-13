@@ -1,15 +1,21 @@
 import React from 'react';
 import {Avatar, Flex, Stack, Text} from 'native-base';
-import Icon from 'react-native-vector-icons/Fontisto';
 import {StyleSheet} from 'react-native';
+import {ClientInterface} from '../../utils/Constants';
 
-const ContactCard = () => {
+interface props {
+  client: ClientInterface;
+}
+
+const ContactCard: React.FC<props> = ({client}) => {
+  console.log({client});
   return (
     <Flex
       flexDirection={'row'}
       gap={2}
       borderWidth={1}
       borderColor={'gray.200'}
+      alignItems={'center'}
       p={2}
       borderRadius={10}>
       <Avatar>SK</Avatar>
@@ -20,9 +26,10 @@ const ContactCard = () => {
         flex={1}>
         <Stack>
           <Text fontWeight={500} fontSize={'md'}>
-            SK Clutch Delhi
+            {client.name}
           </Text>
-          <Text fontSize={'xs'}>+917014015981</Text>
+          <Text fontSize={'xs'}>+91{client.phone}</Text>
+          <Text fontSize={'xs'}>{client.email}</Text>
         </Stack>
         <Text fontWeight={500} fontSize={'md'}>
           View
