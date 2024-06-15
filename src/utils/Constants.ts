@@ -6,3 +6,18 @@ export interface ClientInterface {
   phone: string;
   address: string;
 }
+
+export interface BillItem {
+  itemName: string;
+  itemPrice: string;
+  itemQuantity: string;
+}
+
+export interface BillInterface {
+  billId: string;
+  billDate: Date;
+  client: string;
+  orderItems: BillItem[];
+  totalBillAmount: string;
+  userId: string;
+}

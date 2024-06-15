@@ -1,10 +1,10 @@
-import React from 'react';
+import React, {useContext, useEffect} from 'react';
 import {
   Box,
+  FlatList,
   Flex,
   Heading,
   Pressable,
-  ScrollView,
   Stack,
   Text,
 } from 'native-base';
@@ -13,8 +13,38 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import {StyleSheet} from 'react-native';
 import BillCard from '../components/BillCard';
 import TransactionCard from '../components/TransactionCard';
+import AuthContext from '../context/AuthContext';
+import {getUserDocs} from '../utils/firebase';
 
-const HomeScreen = ({navigation}) => {
+const HomeScreen = ({navigation}: any) => {
+  const {setClients, user, setBills, bills} = useContext(AuthContext);
+  const fetchData = async () => {
+    try {
+      const clients: any = await getUserDocs('Clients', user.uid);
+      if (clients) {
+        setClients(clients);
+      }
+    } catch (error) {
+      console.log('error fetching data', error);
+    }
+  };
+
+  const fetchBills = async () => {
+    try {
+      const res: any = await getUserDocs('Bills', user.uid);
+      setBills(res);
+    } catch (error) {
+      console.log('error fetching bills', error);
+    }
+  };
+
+  console.log({bills});
+
+  useEffect(() => {
+    fetchData();
+    fetchBills();
+  }, []);
+
   return (
     <Box padding={3} backgroundColor={'white'} flex={1}>
       <HomeHeader />
@@ -53,16 +83,14 @@ const HomeScreen = ({navigation}) => {
         </Pressable>
       </Flex>
       <Stack>
-        <ScrollView
+        <FlatList
+          data={bills}
+          renderItem={({item}) => <BillCard bill={item} />}
+          ItemSeparatorComponent={() => <Box mr={2} />}
           horizontal
-          flexDirection={'row'}
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={style.scrollViewContent}>
-          <BillCard />
-          <BillCard />
-          <BillCard />
-          <BillCard />
-        </ScrollView>
+          keyExtractor={item => item?.billId}
+        />
       </Stack>
       <Flex
         p={2}

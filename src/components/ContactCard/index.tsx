@@ -8,7 +8,6 @@ interface props {
 }
 
 const ContactCard: React.FC<props> = ({client}) => {
-  console.log({client});
   return (
     <Flex
       flexDirection={'row'}
@@ -18,7 +17,7 @@ const ContactCard: React.FC<props> = ({client}) => {
       alignItems={'center'}
       p={2}
       borderRadius={10}>
-      <Avatar>SK</Avatar>
+      <Avatar>{client.name.slice(0, 2).toLocaleUpperCase()}</Avatar>
       <Flex
         flexDirection={'row'}
         justifyContent={'space-between'}

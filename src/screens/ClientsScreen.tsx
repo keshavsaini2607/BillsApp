@@ -17,7 +17,6 @@ const ClientsScreen = ({navigation}: any) => {
           (client: any) => client.userId === user.uid,
         );
         setClients(myClients);
-        console.log({clients});
       }
     } catch (error) {
       console.log('error fetching clients', error);
@@ -26,7 +25,6 @@ const ClientsScreen = ({navigation}: any) => {
     }
   };
 
-  console.log({clients});
 
   useEffect(() => {
     fetchClients();

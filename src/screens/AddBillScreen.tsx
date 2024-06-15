@@ -9,6 +9,7 @@ import {
   Stack,
   Text,
   Select,
+  useToast,
 } from 'native-base';
 import Icon from 'react-native-vector-icons/AntDesign';
 import MatIcon from 'react-native-vector-icons/MaterialIcons';
@@ -16,6 +17,9 @@ import BaseModal from '../components/BaseModal';
 import AddItem from '../components/Modals/AddItem';
 import AuthContext from '../context/AuthContext';
 import {FlatList} from 'react-native';
+import {getUserDocs, saveForm} from '../utils/firebase';
+import * as moment from 'moment';
+import uuid from 'react-native-uuid';
 
 interface FormValues {
   client: string;
@@ -23,17 +27,14 @@ interface FormValues {
 }
 
 const AddBillScreen = ({navigation}: any) => {
-  const {user} = useContext(AuthContext);
-  console.log({user});
+  const toast = useToast();
+  const {user, clients, setBills} = useContext(AuthContext);
+  const [loading, setLoading] = useState(false);
   const [formValues, setFormValues] = useState<FormValues>({
     client: '',
     orderItems: [],
   });
   const [showAddItem, setShowAddItem] = useState(false);
-
-  useEffect(() => {
-    console.log('Updated orderItems:', formValues.orderItems);
-  }, [formValues.orderItems]);
 
   const handleModalClose = (values: any) => {
     if (values && Object.keys(values).length > 0) {
@@ -43,7 +44,40 @@ const AddBillScreen = ({navigation}: any) => {
       }));
     }
     setShowAddItem(false);
-    console.log('values===>', values);
+  };
+
+  const handleSubmit = async () => {
+    try {
+      setLoading(true);
+      let totalBillAmount = 0;
+      formValues.orderItems.forEach(item => {
+        let perItemTotal = item.itemPrice * item.itemQuantity;
+        totalBillAmount += perItemTotal;
+      });
+      const response = await saveForm('Bills', {
+        ...formValues,
+        userId: user.uid,
+        billDate: moment.now(),
+        totalBillAmount,
+        billId: uuid.v4(),
+      });
+      if (response) {
+        toast.show({
+          title: 'New bill added',
+        });
+        const res: any = await getUserDocs('Bills', user.uid);
+        setBills(res);
+        navigation.goBack();
+        setFormValues({
+          client: '',
+          orderItems: [],
+        });
+      }
+    } catch (error) {
+      console.log('error adding bill', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const renderItem = ({item, index}: {item: any; index: number}) => (
@@ -136,11 +170,13 @@ const AddBillScreen = ({navigation}: any) => {
               onValueChange={itemValue =>
                 setFormValues(p => ({...p, client: itemValue}))
               }>
-              <Select.Item label="UX Research" value="ux" />
-              <Select.Item label="Web Development" value="web" />
-              <Select.Item label="Cross Platform Development" value="cross" />
-              <Select.Item label="UI Designing" value="ui" />
-              <Select.Item label="Backend Development" value="backend" />
+              {clients.map(client => (
+                <Select.Item
+                  key={client.id}
+                  label={client.name}
+                  value={client.id}
+                />
+              ))}
             </Select>
           </Box>
         </Stack>
@@ -159,7 +195,9 @@ const AddBillScreen = ({navigation}: any) => {
             keyExtractor={(item, index) => index.toString()}
           />
         </Stack>
-        <Button>Save Order</Button>
+        <Button onPress={handleSubmit} isLoading={loading}>
+          Save Order
+        </Button>
       </FormControl>
       <BaseModal
         isOpen={showAddItem}

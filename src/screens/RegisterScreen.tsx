@@ -36,8 +36,6 @@ const RegisterScreen = ({navigation}: any) => {
           email,
           password,
         );
-        console.log('User account created & signed in!');
-        console.log({user});
 
         if (name) {
           const db = getFirestore();

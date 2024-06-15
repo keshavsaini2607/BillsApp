@@ -22,14 +22,6 @@ const RootRouter = () => {
     return subscriber; // unsubscribe on unmount
   }, []);
 
-  useEffect(() => {
-    if (user) {
-      console.log('User is logged in:', user);
-    } else {
-      console.log('No user is logged in');
-    }
-  }, [user]);
-
   if (initializing) {
     return (
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>

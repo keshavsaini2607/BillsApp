@@ -14,6 +14,7 @@ import {getFirestore} from '@react-native-firebase/firestore';
 import {useToast} from 'native-base';
 import AuthContext from '../context/AuthContext';
 import {getAllDocs} from '../utils/firebase';
+import uuid from 'react-native-uuid';
 
 const AddClientScreen = ({navigation}: any) => {
   const {user, setClients} = useContext(AuthContext);
@@ -31,7 +32,7 @@ const AddClientScreen = ({navigation}: any) => {
       const db = getFirestore();
       await db
         .collection('Clients')
-        .add({...formValues, userId: user?.uid})
+        .add({...formValues, userId: user?.uid, id: uuid.v4()})
         .then(async (res: any) => {
           if (res) {
             toast.show({
@@ -52,7 +53,6 @@ const AddClientScreen = ({navigation}: any) => {
               );
               setClients(myClients);
               navigation.navigate('Clients');
-              console.log({clients});
             }
           }
         });
