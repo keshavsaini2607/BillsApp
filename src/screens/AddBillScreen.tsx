@@ -10,6 +10,7 @@ import {
   Text,
   Select,
   useToast,
+  Pressable,
 } from 'native-base';
 import Icon from 'react-native-vector-icons/AntDesign';
 import MatIcon from 'react-native-vector-icons/MaterialIcons';
@@ -17,16 +18,17 @@ import BaseModal from '../components/BaseModal';
 import AddItem from '../components/Modals/AddItem';
 import AuthContext from '../context/AuthContext';
 import {FlatList} from 'react-native';
-import {getUserDocs, saveForm} from '../utils/firebase';
+import {getUserDocs, saveForm, updateForm} from '../utils/firebase';
 import * as moment from 'moment';
 import uuid from 'react-native-uuid';
+import {BillItem} from '../utils/Constants';
 
 interface FormValues {
   client: string;
   orderItems: any[];
 }
 
-const AddBillScreen = ({navigation}: any) => {
+const AddBillScreen = ({navigation, route}: any) => {
   const toast = useToast();
   const {user, clients, setBills} = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
@@ -35,49 +37,105 @@ const AddBillScreen = ({navigation}: any) => {
     orderItems: [],
   });
   const [showAddItem, setShowAddItem] = useState(false);
+  const [itemToUpdate, setItemToUpdate] = useState<BillItem | null>(null);
+
+  useEffect(() => {
+    if (route.params) {
+      const {client, orderItems} = route.params;
+      setFormValues({
+        client,
+        orderItems,
+      });
+    }
+  }, [route.params]);
 
   const handleModalClose = (values: any) => {
     if (values && Object.keys(values).length > 0) {
-      setFormValues(prevFormValues => ({
-        ...prevFormValues,
-        orderItems: [...(prevFormValues.orderItems || []), values],
-      }));
+      const existingIndex = formValues.orderItems.findIndex(
+        obj => obj.itemName === values.itemName,
+      );
+
+      if (existingIndex !== -1) {
+        // Update the existing object with new values
+        const updatedOrderItems = formValues.orderItems.map((obj, index) =>
+          index === existingIndex
+            ? {...obj, ...values} // merge the existing object with new values
+            : obj,
+        );
+        setFormValues(prevFormValues => ({
+          ...prevFormValues,
+          orderItems: updatedOrderItems,
+        }));
+      } else {
+        // Add a new entry to orderItems
+        setFormValues(prevFormValues => ({
+          ...prevFormValues,
+          orderItems: [...(prevFormValues.orderItems || []), values],
+        }));
+      }
     }
+
     setShowAddItem(false);
   };
 
   const handleSubmit = async () => {
     try {
       setLoading(true);
+      const {billId} = route.params;
       let totalBillAmount = 0;
       formValues.orderItems.forEach(item => {
         let perItemTotal = item.itemPrice * item.itemQuantity;
         totalBillAmount += perItemTotal;
       });
-      const response = await saveForm('Bills', {
-        ...formValues,
-        userId: user.uid,
-        billDate: moment.now(),
-        totalBillAmount,
-        billId: uuid.v4(),
-      });
-      if (response) {
-        toast.show({
-          title: 'New bill added',
+      if (billId) {
+        const updateRes: any = await updateForm(
+          'Bills',
+          {...formValues, totalBillAmount, updateDate: moment.now()},
+          billId,
+          'billId',
+        );
+        if (updateRes) {
+          toast.show({
+            title: 'Updated bill details',
+          });
+        }
+      } else {
+        const response = await saveForm('Bills', {
+          ...formValues,
+          userId: user.uid,
+          billDate: moment.now(),
+          totalBillAmount,
+          billId: uuid.v4(),
         });
-        const res: any = await getUserDocs('Bills', user.uid);
-        setBills(res);
-        navigation.goBack();
-        setFormValues({
-          client: '',
-          orderItems: [],
-        });
+        if (response) {
+          toast.show({
+            title: 'New bill added',
+          });
+        }
       }
     } catch (error) {
       console.log('error adding bill', error);
     } finally {
       setLoading(false);
+      const res: any = await getUserDocs('Bills', user.uid);
+      setBills(res);
+      navigation.goBack();
+      setFormValues({
+        client: '',
+        orderItems: [],
+      });
     }
+  };
+
+  const handleDeleteItem = (item: BillItem) => {
+    const filteredItems = formValues.orderItems.filter(
+      obj => obj.itemName !== item.itemName,
+    );
+
+    setFormValues(prevFormValues => ({
+      ...prevFormValues,
+      orderItems: filteredItems,
+    }));
   };
 
   const renderItem = ({item, index}: {item: any; index: number}) => (
@@ -105,7 +163,18 @@ const AddBillScreen = ({navigation}: any) => {
               <Text fontSize={'xs'}>{item?.itemName}</Text>
             </Stack>
           </Flex>
-          <Icon name="right" size={20} />
+          <Flex flexDirection={'row'} alignItems={'center'} gap={4}>
+            <Pressable
+              onPress={() => {
+                setShowAddItem(true);
+                setItemToUpdate(item);
+              }}>
+              <Icon name="edit" size={20} />
+            </Pressable>
+            <Pressable onPress={() => handleDeleteItem(item)}>
+              <Icon name="delete" size={20} />
+            </Pressable>
+          </Flex>
         </Flex>
         <Flex
           width={'90%'}
@@ -151,7 +220,9 @@ const AddBillScreen = ({navigation}: any) => {
           borderColor={'gray.500'}>
           <Icon name="left" size={20} onPress={() => navigation.goBack()} />
         </Flex>
-        <Heading>Add New Bill</Heading>
+        <Heading>
+          {route.params ? 'Update Bill Details' : 'Add New Bill'}
+        </Heading>
         <Text></Text>
       </Flex>
       <FormControl flex={1}>
@@ -162,6 +233,7 @@ const AddBillScreen = ({navigation}: any) => {
               selectedValue={formValues.client}
               accessibilityLabel="Choose Service"
               placeholder="Choose Service"
+              isDisabled={route.params ? true : false}
               _selectedItem={{
                 bg: 'teal.600',
                 endIcon: <CheckIcon size="5" />,
@@ -181,7 +253,12 @@ const AddBillScreen = ({navigation}: any) => {
           </Box>
         </Stack>
         <Stack mt={3}>
-          <Button variant={'subtle'} onPress={() => setShowAddItem(true)}>
+          <Button
+            variant={'subtle'}
+            onPress={() => {
+              setShowAddItem(true);
+              setItemToUpdate(null);
+            }}>
             Add Item +
           </Button>
         </Stack>
@@ -196,14 +273,14 @@ const AddBillScreen = ({navigation}: any) => {
           />
         </Stack>
         <Button onPress={handleSubmit} isLoading={loading}>
-          Save Order
+          {route.params ? 'Update Order' : 'Save Order'}
         </Button>
       </FormControl>
       <BaseModal
         isOpen={showAddItem}
         onClose={handleModalClose}
-        heading="Add Order Item">
-        <AddItem />
+        heading={itemToUpdate ? 'Update Order Item' : 'Add Order Item'}>
+        <AddItem item={itemToUpdate} />
       </BaseModal>
     </Box>
   );

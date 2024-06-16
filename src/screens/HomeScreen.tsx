@@ -85,7 +85,9 @@ const HomeScreen = ({navigation}: any) => {
       <Stack>
         <FlatList
           data={bills}
-          renderItem={({item}) => <BillCard bill={item} />}
+          renderItem={({item}) => (
+            <BillCard bill={item} navigation={navigation} />
+          )}
           ItemSeparatorComponent={() => <Box mr={2} />}
           horizontal
           showsHorizontalScrollIndicator={false}

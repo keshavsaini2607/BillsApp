@@ -1,9 +1,8 @@
-import React, {useContext, useEffect, useState} from 'react';
-import {Avatar, Box, Flex, Stack, Text} from 'native-base';
+import React, {useEffect, useState} from 'react';
+import {Avatar, Box, Flex, Pressable, Stack, Text} from 'native-base';
 import {Dimensions, StyleSheet} from 'react-native';
 import {BillInterface} from '../../utils/Constants';
-import {getUserById, getUserByIds, getUserDocsById} from '../../utils/firebase';
-import AuthContext from '../../context/AuthContext';
+import {getUser} from '../../utils/firebase';
 
 const BgColors = [
   {
@@ -22,9 +21,10 @@ const BgColors = [
 
 interface props {
   bill: BillInterface;
+  navigation: any;
 }
 
-const BillCard: React.FC<props> = ({bill}) => {
+const BillCard: React.FC<props> = ({navigation, bill}: any) => {
   const [accentColor, setAccentColor] = useState(BgColors[0]);
   const [client, setClient] = useState<any>(null);
   const getRandomBg = () => {
@@ -35,8 +35,7 @@ const BillCard: React.FC<props> = ({bill}) => {
   const getClientData = async () => {
     try {
       console.log(bill.client);
-      const res: any = await getUserByIds(bill.client);
-      console.log({res});
+      const res: any = await getUser(bill.client, 'id');
       setClient(res[0]);
     } catch (error) {
       console.log('error getting user', error);
@@ -49,10 +48,17 @@ const BillCard: React.FC<props> = ({bill}) => {
     getClientData();
   }, []);
 
-  console.log({client});
+  console.log({bill});
 
   return (
-    <Box
+    <Pressable
+      onPress={() =>
+        navigation.navigate('AddBill', {
+          client: bill.client,
+          orderItems: bill.orderItems,
+          billId: bill.billId,
+        })
+      }
       borderWidth={1}
       style={[
         styles.cardContainer,
@@ -61,19 +67,22 @@ const BillCard: React.FC<props> = ({bill}) => {
           borderColor: accentColor?.secondary || '#cdcdcd',
         },
       ]}>
-      <Flex flexDirection={'row'} alignItems={'center'} gap={1}>
-        <Text style={{height: 20, width: 2, backgroundColor: '#cdcdcd'}}></Text>
-        <Avatar size={6}>{client?.name[0]?.toLocaleUpperCase()}</Avatar>
-      </Flex>
-      <Stack mt={2}>
-        <Text fontSize={'xs'}>No. Of Items:</Text>
-        <Text fontWeight={600}>{bill.orderItems.length}</Text>
-      </Stack>
-      <Stack mt={1}>
-        <Text fontSize={'xs'}>Total Bill Amount:</Text>
-        <Text fontWeight={600}>₹{bill.totalBillAmount}</Text>
-      </Stack>
-    </Box>
+      <Box>
+        <Flex flexDirection={'row'} alignItems={'center'} gap={1}>
+          <Text
+            style={{height: 20, width: 2, backgroundColor: '#cdcdcd'}}></Text>
+          <Avatar size={6}>{client?.name[0]?.toLocaleUpperCase()}</Avatar>
+        </Flex>
+        <Stack mt={2}>
+          <Text fontSize={'xs'}>No. Of Items:</Text>
+          <Text fontWeight={600}>{bill.orderItems.length}</Text>
+        </Stack>
+        <Stack mt={1}>
+          <Text fontSize={'xs'}>Total Bill Amount:</Text>
+          <Text fontWeight={600}>₹{bill.totalBillAmount}</Text>
+        </Stack>
+      </Box>
+    </Pressable>
   );
 };
 
