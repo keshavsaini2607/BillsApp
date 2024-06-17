@@ -104,9 +104,11 @@ const HomeScreen = ({navigation}: any) => {
           Transaction history
         </Text>
         <Flex flexDirection={'row'} alignItems={'center'}>
-          <Text fontSize={15} fontWeight={500} color={'#0175FF'}>
-            Show More
-          </Text>{' '}
+          <Pressable onPress={() => navigation.navigate('Transaction')}>
+            <Text fontSize={15} fontWeight={500} color={'#0175FF'}>
+              Show More
+            </Text>
+          </Pressable>{' '}
           <Icon name="chevron-right" size={20} color={'#0175FF'} />
         </Flex>
       </Flex>
