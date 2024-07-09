@@ -16,7 +16,6 @@ const AddItem: React.FC<props> = ({item}) => {
   });
 
   useEffect(() => {
-    console.log({item});
     if (item) {
       setFormValues({
         itemName: item.itemName,

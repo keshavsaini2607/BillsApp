@@ -1,5 +1,9 @@
 import {Dispatch, SetStateAction, createContext} from 'react';
-import {BillInterface, ClientInterface} from '../utils/Constants';
+import {
+  BillInterface,
+  ClientInterface,
+  TransactionInterface,
+} from '../utils/Constants';
 
 interface AuthContextInterface {
   user: any;
@@ -8,6 +12,8 @@ interface AuthContextInterface {
   setClients: Dispatch<SetStateAction<[] | ClientInterface[]>>;
   setBills: Dispatch<SetStateAction<[] | BillInterface[]>>;
   bills: BillInterface[];
+  transactions: TransactionInterface[];
+  setTransactions: Dispatch<SetStateAction<[] | TransactionInterface[]>>;
 }
 
 // Create a context with a default value
@@ -18,6 +24,8 @@ const AuthContext = createContext<AuthContextInterface>({
   setClients: () => {},
   setBills: () => {},
   bills: [],
+  transactions: [],
+  setTransactions: () => {},
 });
 
 export default AuthContext;

@@ -21,3 +21,14 @@ export interface BillInterface {
   totalBillAmount: string;
   userId: string;
 }
+
+export interface TransactionInterface {
+  id: string;
+  amountReceived: string;
+  amountSent: string;
+  client: string;
+  mode: string;
+  reasonOfPayment: string;
+  typeOfTransaction: string;
+  dateOfPayment: string;
+}

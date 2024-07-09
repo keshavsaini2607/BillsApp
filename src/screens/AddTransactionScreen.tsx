@@ -11,10 +11,14 @@ import {
   Select,
   Stack,
   Text,
+  useToast,
 } from 'native-base';
 import Icon from 'react-native-vector-icons/AntDesign';
 import {StyleSheet} from 'react-native';
 import AuthContext from '../context/AuthContext';
+import {getAllDocs, saveForm} from '../utils/firebase';
+import uuid from 'react-native-uuid';
+import moment from 'moment';
 
 export enum TabTypes {
   'BillPayment' = 'Bill Payment',
@@ -24,7 +28,9 @@ export enum TabTypes {
 const paymentModes = ['Cash', 'Bank', 'UPI'];
 
 const AddTransactionScreen = ({navigation}: any) => {
-  const {clients} = useContext(AuthContext);
+  const toast = useToast();
+  const [loading, setLoading] = useState(false);
+  const {clients, setTransactions} = useContext(AuthContext);
   const [activeTab, setActiveTab] = useState<TabTypes>(TabTypes.BillPayment);
 
   const [formValues, setFormValues] = useState({
@@ -34,6 +40,35 @@ const AddTransactionScreen = ({navigation}: any) => {
     amountSent: '',
     reasonOfPayment: '',
   });
+
+  const handleSubmit = async () => {
+    setLoading(true);
+    try {
+      const body = {
+        id: uuid.v4(),
+        ...formValues,
+        typeOfTransaction: activeTab,
+        dateOfPayment: moment.now(),
+      };
+
+      const response: any = await saveForm('Transactions', body);
+      if (response) {
+        toast.show({
+          title: 'Transaction Saved',
+        });
+        const res: any[] = await getAllDocs('Transactions');
+        if (response) {
+          setTransactions(res);
+        }
+        navigation.goBack();
+      }
+    } catch (error) {
+      console.log('error saving transaction', error);
+      setLoading(false);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Box p={4} background={'white'} flex={1}>
@@ -130,6 +165,9 @@ const AddTransactionScreen = ({navigation}: any) => {
           <FormControl.Label>Amount Received</FormControl.Label>
           <Input
             value={formValues.amountReceived}
+            onChangeText={text =>
+              setFormValues(p => ({...p, amountReceived: text}))
+            }
             placeholder="Amount received in INR"
           />
         </Stack>
@@ -139,6 +177,9 @@ const AddTransactionScreen = ({navigation}: any) => {
           <FormControl.Label>Amount Spent</FormControl.Label>
           <Input
             value={formValues.amountSent}
+            onChangeText={text =>
+              setFormValues(p => ({...p, amountSent: text}))
+            }
             placeholder="Amount received in INR"
           />
         </Stack>
@@ -149,6 +190,9 @@ const AddTransactionScreen = ({navigation}: any) => {
           <Input
             value={formValues.reasonOfPayment}
             placeholder="Reason for payment"
+            onChangeText={text =>
+              setFormValues(p => ({...p, reasonOfPayment: text}))
+            }
           />
         </Stack>
       )}
@@ -157,7 +201,9 @@ const AddTransactionScreen = ({navigation}: any) => {
         bottom={5}
         width={'full'}
         alignSelf={'center'}>
-        <Button>Save Transaction</Button>
+        <Button isLoading={loading} onPress={handleSubmit}>
+          Save Transaction
+        </Button>
       </Stack>
     </Box>
   );

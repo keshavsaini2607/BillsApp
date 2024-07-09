@@ -1,9 +1,20 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {Flex, Stack, Text} from 'native-base';
 import Icon from 'react-native-vector-icons/Fontisto';
 import {StyleSheet} from 'react-native';
+import {TransactionInterface} from '../../utils/Constants';
+import AuthContext from '../../context/AuthContext';
+import moment from 'moment';
 
-const TransactionCard = () => {
+interface props {
+  transaction: TransactionInterface;
+}
+
+const TransactionCard: React.FC<props> = ({transaction}) => {
+  const {clients} = useContext(AuthContext);
+  const getClientName = (clientId: string) => {
+    return clients.find(val => val.id === clientId)?.name;
+  };
   return (
     <Flex
       flexDirection={'row'}
@@ -22,13 +33,21 @@ const TransactionCard = () => {
         flex={1}>
         <Stack>
           <Text fontWeight={500} fontSize={'md'}>
-            Transport
+            {getClientName(transaction?.client) || transaction?.reasonOfPayment}
           </Text>
-          <Text fontSize={'xs'}>Sunday 8th June, 2024</Text>
+          <Text fontSize={'xs'}>
+            {moment(transaction?.dateOfPayment).format('DD/MM/YYYY')}
+          </Text>
         </Stack>
-        <Text fontWeight={500} fontSize={'md'}>
-          ₹990
-        </Text>
+        <Stack alignItems={'center'}>
+          <Text
+            fontWeight={500}
+            fontSize={'md'}
+            style={transaction?.amountReceived ? styles.credit : styles.debit}>
+            ₹{transaction?.amountReceived || transaction?.amountSent}
+          </Text>
+          <Text>{transaction?.mode}</Text>
+        </Stack>
       </Flex>
     </Flex>
   );
@@ -45,5 +64,11 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     borderColor: 'transparent',
     backgroundColor: '#FED5D5',
+  },
+  debit: {
+    color: 'red',
+  },
+  credit: {
+    color: 'green',
   },
 });

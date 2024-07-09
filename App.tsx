@@ -5,7 +5,11 @@ import {NavigationContainer} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RootRouter from './src/router/rootRouter';
 import AuthContext from './src/context/AuthContext';
-import {BillInterface, ClientInterface} from './src/utils/Constants';
+import {
+  BillInterface,
+  ClientInterface,
+  TransactionInterface,
+} from './src/utils/Constants';
 
 const colorModeManager: StorageManager = {
   get: async () => {
@@ -29,11 +33,23 @@ const App = () => {
   const [user, setUser] = useState({});
   const [clients, setClients] = useState<ClientInterface[] | []>([]);
   const [bills, setBills] = useState<BillInterface[] | []>([]);
+  const [transactions, setTransactions] = useState<TransactionInterface[] | []>(
+    [],
+  );
   return (
     <NavigationContainer>
       <NativeBaseProvider colorModeManager={colorModeManager}>
         <AuthContext.Provider
-          value={{user, setUser, clients, setClients, bills, setBills}}>
+          value={{
+            user,
+            setUser,
+            clients,
+            setClients,
+            bills,
+            setBills,
+            transactions,
+            setTransactions,
+          }}>
           <RootRouter />
         </AuthContext.Provider>
       </NativeBaseProvider>

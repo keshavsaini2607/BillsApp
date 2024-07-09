@@ -118,6 +118,7 @@ const AddBillScreen = ({navigation, route}: any) => {
     } finally {
       setLoading(false);
       const res: any = await getUserDocs('Bills', user.uid);
+      console.log({res});
       setBills(res);
       navigation.goBack();
       setFormValues({

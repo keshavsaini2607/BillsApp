@@ -34,7 +34,6 @@ const BillCard: React.FC<props> = ({navigation, bill}: any) => {
 
   const getClientData = async () => {
     try {
-      console.log(bill.client);
       const res: any = await getUser(bill.client, 'id');
       setClient(res[0]);
     } catch (error) {
@@ -48,7 +47,6 @@ const BillCard: React.FC<props> = ({navigation, bill}: any) => {
     getClientData();
   }, []);
 
-  console.log({bill});
 
   return (
     <Pressable

@@ -16,6 +16,7 @@ const ClientsScreen = ({navigation}: any) => {
         const myClients = clientResults.filter(
           (client: any) => client.userId === user.uid,
         );
+
         setClients(myClients);
       }
     } catch (error) {
@@ -24,7 +25,6 @@ const ClientsScreen = ({navigation}: any) => {
       setLoading(false);
     }
   };
-
 
   useEffect(() => {
     fetchClients();

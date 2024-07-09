@@ -14,10 +14,11 @@ import {StyleSheet} from 'react-native';
 import BillCard from '../components/BillCard';
 import TransactionCard from '../components/TransactionCard';
 import AuthContext from '../context/AuthContext';
-import {getUserDocs} from '../utils/firebase';
+import {getAllDocs, getUserDocs} from '../utils/firebase';
 
 const HomeScreen = ({navigation}: any) => {
-  const {setClients, user, setBills, bills} = useContext(AuthContext);
+  const {setClients, user, setBills, bills, transactions, setTransactions} =
+    useContext(AuthContext);
   const fetchData = async () => {
     try {
       const clients: any = await getUserDocs('Clients', user.uid);
@@ -26,6 +27,17 @@ const HomeScreen = ({navigation}: any) => {
       }
     } catch (error) {
       console.log('error fetching data', error);
+    }
+  };
+
+  const fetchTransactions = async () => {
+    try {
+      const response: any[] = await getAllDocs('Transactions');
+      if (response) {
+        setTransactions(response);
+      }
+    } catch (error) {
+      console.log('error fetching bills', error);
     }
   };
 
@@ -43,7 +55,10 @@ const HomeScreen = ({navigation}: any) => {
   useEffect(() => {
     fetchData();
     fetchBills();
+    fetchTransactions();
   }, []);
+
+  console.log({transactions});
 
   return (
     <Box padding={3} backgroundColor={'white'} flex={1}>
@@ -113,7 +128,12 @@ const HomeScreen = ({navigation}: any) => {
         </Flex>
       </Flex>
       <Stack p={2}>
-        <TransactionCard />
+        <FlatList
+          data={transactions}
+          renderItem={({item}) => <TransactionCard transaction={item} />}
+          ItemSeparatorComponent={() => <Box mb={2} />}
+          keyExtractor={item => item.id.toString()}
+        />
       </Stack>
     </Box>
   );
