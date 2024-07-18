@@ -103,7 +103,6 @@ const AddBillScreen = ({navigation, route}: any) => {
         totalBillAmount += perItemTotal;
       });
       let balance = totalBillAmount + balanceAmount;
-      console.log({balance});
       if (route?.params && route?.params?.billId) {
         const {billId} = route.params;
         const updateRes: any = await updateForm(

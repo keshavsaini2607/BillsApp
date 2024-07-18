@@ -141,8 +141,8 @@ const AddTransactionScreen = ({navigation}: any) => {
           <Box>
             <Select
               selectedValue={formValues.client}
-              accessibilityLabel="Choose Service"
-              placeholder="Choose Service"
+              accessibilityLabel="Select Client"
+              placeholder="Select Client"
               _selectedItem={{
                 bg: 'teal.600',
                 endIcon: <CheckIcon size="5" />,
