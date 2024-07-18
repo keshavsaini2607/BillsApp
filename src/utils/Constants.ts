@@ -5,6 +5,7 @@ export interface ClientInterface {
   email: string;
   phone: string;
   address: string;
+  amountBalance: number;
 }
 
 export interface BillItem {
@@ -20,6 +21,7 @@ export interface BillInterface {
   orderItems: BillItem[];
   totalBillAmount: string;
   userId: string;
+  balanceAmount: number;
 }
 
 export interface TransactionInterface {

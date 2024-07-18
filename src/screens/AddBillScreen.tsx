@@ -18,10 +18,10 @@ import BaseModal from '../components/BaseModal';
 import AddItem from '../components/Modals/AddItem';
 import AuthContext from '../context/AuthContext';
 import {FlatList} from 'react-native';
-import {getUserDocs, saveForm, updateForm} from '../utils/firebase';
+import {getUser, getUserDocs, saveForm, updateForm} from '../utils/firebase';
 import * as moment from 'moment';
 import uuid from 'react-native-uuid';
-import {BillItem} from '../utils/Constants';
+import {BillItem, ClientInterface} from '../utils/Constants';
 
 interface FormValues {
   client: string;
@@ -36,6 +36,7 @@ const AddBillScreen = ({navigation, route}: any) => {
     client: '',
     orderItems: [],
   });
+  const [balanceAmount, setBalanceAmount] = useState(0);
   const [showAddItem, setShowAddItem] = useState(false);
   const [itemToUpdate, setItemToUpdate] = useState<BillItem | null>(null);
 
@@ -48,6 +49,17 @@ const AddBillScreen = ({navigation, route}: any) => {
       });
     }
   }, [route.params]);
+
+  useEffect(() => {
+    if (formValues.client) {
+      (async () => {
+        const clientInfo: any = await getUser(formValues.client, 'id');
+        if (clientInfo && clientInfo[0].amountBalance) {
+          setBalanceAmount(clientInfo[0].amountBalance);
+        }
+      })();
+    }
+  }, [formValues.client]);
 
   const handleModalClose = (values: any) => {
     if (values && Object.keys(values).length > 0) {
@@ -81,16 +93,27 @@ const AddBillScreen = ({navigation, route}: any) => {
   const handleSubmit = async () => {
     try {
       setLoading(true);
-      const {billId} = route.params;
       let totalBillAmount = 0;
+      const clientDetails: ClientInterface = await getUser(
+        formValues.client,
+        'id',
+      );
       formValues.orderItems.forEach(item => {
         let perItemTotal = item.itemPrice * item.itemQuantity;
         totalBillAmount += perItemTotal;
       });
-      if (billId) {
+      let balance = totalBillAmount + balanceAmount;
+      console.log({balance});
+      if (route?.params && route?.params?.billId) {
+        const {billId} = route.params;
         const updateRes: any = await updateForm(
           'Bills',
-          {...formValues, totalBillAmount, updateDate: moment.now()},
+          {
+            ...formValues,
+            totalBillAmount,
+            updateDate: moment.now(),
+            balanceAmount: balance,
+          },
           billId,
           'billId',
         );
@@ -99,12 +122,29 @@ const AddBillScreen = ({navigation, route}: any) => {
             title: 'Updated bill details',
           });
         }
+        await updateForm(
+          'Clients',
+          {
+            amountBalance: balance,
+          },
+          formValues.client,
+          'id',
+        );
       } else {
+        await updateForm(
+          'Clients',
+          {
+            amountBalance: balance,
+          },
+          formValues.client,
+          'id',
+        );
         const response = await saveForm('Bills', {
           ...formValues,
           userId: user.uid,
           billDate: moment.now(),
-          totalBillAmount,
+          totalBillAmount: totalBillAmount + balanceAmount,
+          balanceAmount: balance,
           billId: uuid.v4(),
         });
         if (response) {
@@ -138,6 +178,8 @@ const AddBillScreen = ({navigation, route}: any) => {
       orderItems: filteredItems,
     }));
   };
+
+  console.log({balanceAmount});
 
   const renderItem = ({item, index}: {item: any; index: number}) => (
     <Flex
@@ -252,6 +294,11 @@ const AddBillScreen = ({navigation, route}: any) => {
               ))}
             </Select>
           </Box>
+        </Stack>
+        <Stack>
+          <FormControl.Label>
+            Previous Balance: ₹{balanceAmount}
+          </FormControl.Label>
         </Stack>
         <Stack mt={3}>
           <Button

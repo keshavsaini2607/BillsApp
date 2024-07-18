@@ -25,6 +25,7 @@ const AddClientScreen = ({navigation}: any) => {
     phone: '',
     email: '',
     address: '',
+    amountBalance: 0,
   });
   const submitForm = async () => {
     try {
@@ -44,6 +45,7 @@ const AddClientScreen = ({navigation}: any) => {
               email: '',
               phone: '',
               address: '',
+              amountBalance: 0,
             });
             setLoading(false);
             const clientResults: any = await getAllDocs('Clients');

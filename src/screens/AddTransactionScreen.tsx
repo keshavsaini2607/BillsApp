@@ -16,9 +16,11 @@ import {
 import Icon from 'react-native-vector-icons/AntDesign';
 import {StyleSheet} from 'react-native';
 import AuthContext from '../context/AuthContext';
-import {getAllDocs, saveForm} from '../utils/firebase';
+import {getAllDocs, getUser, saveForm, updateForm} from '../utils/firebase';
 import uuid from 'react-native-uuid';
 import moment from 'moment';
+import {BillInterface, ClientInterface} from '../utils/Constants';
+import {getLastBill} from '../utils/helpers';
 
 export enum TabTypes {
   'BillPayment' = 'Bill Payment',
@@ -44,6 +46,7 @@ const AddTransactionScreen = ({navigation}: any) => {
   const handleSubmit = async () => {
     setLoading(true);
     try {
+      const clientDetails: any = await getUser(formValues.client, 'id');
       const body = {
         id: uuid.v4(),
         ...formValues,
@@ -56,6 +59,26 @@ const AddTransactionScreen = ({navigation}: any) => {
         toast.show({
           title: 'Transaction Saved',
         });
+        if (activeTab === TabTypes.BillPayment) {
+          const trxnAmount = parseInt(formValues.amountReceived, 10);
+          const balanceAmount: number =
+            clientDetails[0].amountBalance - trxnAmount;
+
+          console.log('client Balance', clientDetails);
+          console.log({trxnAmount});
+          console.log(balanceAmount);
+
+          if (!isNaN(balanceAmount)) {
+            await updateForm(
+              'Clients',
+              {
+                amountBalance: balanceAmount,
+              },
+              formValues.client,
+              'id',
+            );
+          }
+        }
         const res: any[] = await getAllDocs('Transactions');
         if (response) {
           setTransactions(res);
@@ -164,6 +187,7 @@ const AddTransactionScreen = ({navigation}: any) => {
         <Stack>
           <FormControl.Label>Amount Received</FormControl.Label>
           <Input
+            keyboardType="numeric"
             value={formValues.amountReceived}
             onChangeText={text =>
               setFormValues(p => ({...p, amountReceived: text}))
