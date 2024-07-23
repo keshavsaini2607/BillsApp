@@ -37,6 +37,7 @@ const BillCard: React.FC<props> = ({navigation, bill}: any) => {
       const res: any = await getUser(bill.client, 'id');
       setClient(res[0]);
     } catch (error) {
+      console.log('erro')
       console.log('error getting user', error);
     }
   };
@@ -44,9 +45,11 @@ const BillCard: React.FC<props> = ({navigation, bill}: any) => {
   useEffect(() => {
     const color = getRandomBg();
     setAccentColor(color);
-    getClientData();
+    console.log(bill)
+    if (bill) {
+      getClientData();
+    }
   }, []);
-
 
   return (
     <Pressable
@@ -67,17 +70,16 @@ const BillCard: React.FC<props> = ({navigation, bill}: any) => {
       ]}>
       <Box>
         <Flex flexDirection={'row'} alignItems={'center'} gap={1}>
-          <Text
-            style={{height: 20, width: 2, backgroundColor: '#cdcdcd'}}></Text>
+          <Text style={{height: 20, width: 2, backgroundColor: '#cdcdcd'}} />
           <Avatar size={6}>{client?.name[0]?.toLocaleUpperCase()}</Avatar>
         </Flex>
         <Stack mt={2}>
           <Text fontSize={'xs'}>No. Of Items:</Text>
-          <Text fontWeight={600}>{bill.orderItems.length}</Text>
+          <Text fontWeight={600}>{bill?.orderItems?.length}</Text>
         </Stack>
         <Stack mt={1}>
           <Text fontSize={'xs'}>Total Bill Amount:</Text>
-          <Text fontWeight={600}>₹{bill.totalBillAmount}</Text>
+          <Text fontWeight={600}>₹{bill?.totalBillAmount}</Text>
         </Stack>
       </Box>
     </Pressable>

@@ -58,8 +58,16 @@ const ClientsScreen = ({navigation}: any) => {
         ) : (
           <FlatList
             data={clients}
-            renderItem={({item}) => <ContactCard client={item} />}
-            ItemSeparatorComponent={() => <Box mb={2} />}
+            renderItem={({item}) => (
+              <ContactCard client={item} navigation={navigation} />
+            )}
+            ItemSeparatorComponent={() => (
+              <Box
+                mb={2}
+                borderBottomWidth={1}
+                borderBottomColor={'gray.200'}
+              />
+            )}
             keyExtractor={item => item.id}
           />
         )}

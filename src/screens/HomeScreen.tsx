@@ -1,4 +1,4 @@
-import React, {useContext, useEffect} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {
   Box,
   FlatList,
@@ -10,7 +10,7 @@ import {
 } from 'native-base';
 import HomeHeader from '../components/HomeHeader';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import {StyleSheet} from 'react-native';
+import {RefreshControl, StyleSheet} from 'react-native';
 import BillCard from '../components/BillCard';
 import TransactionCard from '../components/TransactionCard';
 import AuthContext from '../context/AuthContext';
@@ -19,6 +19,13 @@ import {getAllDocs, getUserDocs} from '../utils/firebase';
 const HomeScreen = ({navigation}: any) => {
   const {setClients, user, setBills, bills, transactions, setTransactions} =
     useContext(AuthContext);
+
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+  };
+
   const fetchData = async () => {
     try {
       const clients: any = await getUserDocs('Clients', user.uid);
@@ -43,22 +50,21 @@ const HomeScreen = ({navigation}: any) => {
 
   const fetchBills = async () => {
     try {
+      console.log('fetching bills')
       const res: any = await getUserDocs('Bills', user.uid);
       setBills(res);
     } catch (error) {
       console.log('error fetching bills', error);
+    } finally {
+      setRefreshing(false);
     }
   };
-
-  console.log({bills});
 
   useEffect(() => {
     fetchData();
     fetchBills();
     fetchTransactions();
-  }, []);
-
-  console.log({transactions});
+  }, [refreshing]);
 
   return (
     <Box padding={3} backgroundColor={'white'} flex={1}>
@@ -71,7 +77,7 @@ const HomeScreen = ({navigation}: any) => {
         justifyContent={'space-between'}>
         <Stack>
           <Text color={'gray.400'}>Your Balance This Month</Text>
-          <Heading fontSize={40}>₹20,021</Heading>
+          <Heading fontSize={40}>----</Heading>
         </Stack>
         <Stack>
           <Icon
@@ -107,6 +113,9 @@ const HomeScreen = ({navigation}: any) => {
           horizontal
           showsHorizontalScrollIndicator={false}
           keyExtractor={item => item?.billId}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
         />
       </Stack>
       <Flex

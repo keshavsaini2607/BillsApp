@@ -1,8 +1,7 @@
 import 'react-native-gesture-handler';
 import React, {useState} from 'react';
-import {ColorMode, NativeBaseProvider, StorageManager} from 'native-base';
+import {NativeBaseProvider, extendTheme} from 'native-base';
 import {NavigationContainer} from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import RootRouter from './src/router/rootRouter';
 import AuthContext from './src/context/AuthContext';
 import {
@@ -11,23 +10,22 @@ import {
   TransactionInterface,
 } from './src/utils/Constants';
 
-const colorModeManager: StorageManager = {
-  get: async () => {
-    try {
-      let val = await AsyncStorage.getItem('@color-mode');
-      return val === 'dark' ? 'dark' : 'light';
-    } catch (e) {
-      return 'light';
-    }
+const customTheme = extendTheme({
+  colors: {
+    primary: {
+      50: '#0175FF',
+      100: '#0175FF',
+      200: '#0175FF',
+      300: '#0175FF',
+      400: '#0175FF',
+      500: '#0175FF', // Updated primary color
+      600: '#0175FF',
+      700: '#0175FF',
+      800: '#0175FF',
+      900: '#0175FF',
+    },
   },
-  set: async (value: ColorMode) => {
-    try {
-      await AsyncStorage.setItem('@color-mode', value);
-    } catch (e) {
-      console.log(e);
-    }
-  },
-};
+});
 
 const App = () => {
   const [user, setUser] = useState({});
@@ -38,7 +36,7 @@ const App = () => {
   );
   return (
     <NavigationContainer>
-      <NativeBaseProvider colorModeManager={colorModeManager}>
+      <NativeBaseProvider theme={customTheme}>
         <AuthContext.Provider
           value={{
             user,

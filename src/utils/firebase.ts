@@ -116,6 +116,35 @@ export const getUser = async (id: string, key: string) => {
     const q = query(usersRef, where(key, '==', id));
 
     const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      console.log('No matching documents.');
+      return null; // Return null if no documents are found
+    }
+
+    const userData: any[] = [];
+
+    querySnapshot.forEach(doc => {
+      userData.push({
+        id: doc.id,
+        ...doc.data(),
+      });
+    });
+
+    return userData;
+  } catch (error) {
+    console.error('Error getting user:', error);
+    return null; // Handle error appropriately
+  }
+};
+
+export const getCurrentUser = async (id: string, key: string) => {
+  try {
+    const db = getFirestore();
+    const usersRef = collection(db, 'Users');
+    const q = query(usersRef, where(key, '==', id));
+
+    const querySnapshot = await getDocs(q);
     console.log({querySnapshot});
 
     if (querySnapshot.empty) {

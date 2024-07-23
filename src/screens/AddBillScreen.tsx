@@ -54,9 +54,11 @@ const AddBillScreen = ({navigation, route}: any) => {
     if (formValues.client) {
       (async () => {
         const clientInfo: any = await getUser(formValues.client, 'id');
-        if (clientInfo && clientInfo[0].amountBalance) {
+        if (clientInfo && clientInfo[0]) {
           setBalanceAmount(clientInfo[0].amountBalance);
         }
+        console.log({clientInfo});
+        console.log(clientInfo[0]?.amountBalance);
       })();
     }
   }, [formValues.client]);
@@ -157,7 +159,6 @@ const AddBillScreen = ({navigation, route}: any) => {
     } finally {
       setLoading(false);
       const res: any = await getUserDocs('Bills', user.uid);
-      console.log({res});
       setBills(res);
       navigation.goBack();
       setFormValues({
@@ -177,8 +178,6 @@ const AddBillScreen = ({navigation, route}: any) => {
       orderItems: filteredItems,
     }));
   };
-
-  console.log({balanceAmount});
 
   const renderItem = ({item, index}: {item: any; index: number}) => (
     <Flex
@@ -301,7 +300,7 @@ const AddBillScreen = ({navigation, route}: any) => {
         </Stack>
         <Stack mt={3}>
           <Button
-            variant={'subtle'}
+            variant={'outline'}
             onPress={() => {
               setShowAddItem(true);
               setItemToUpdate(null);

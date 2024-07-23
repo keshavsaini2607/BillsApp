@@ -6,7 +6,7 @@ import {View, ActivityIndicator} from 'react-native';
 import AuthContext from '../context/AuthContext';
 
 const RootRouter = () => {
-  const {setUser, user} = useContext(AuthContext);
+  const {setUser} = useContext(AuthContext);
   const [initializing, setInitializing] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 

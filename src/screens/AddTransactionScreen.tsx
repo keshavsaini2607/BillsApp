@@ -19,8 +19,6 @@ import AuthContext from '../context/AuthContext';
 import {getAllDocs, getUser, saveForm, updateForm} from '../utils/firebase';
 import uuid from 'react-native-uuid';
 import moment from 'moment';
-import {BillInterface, ClientInterface} from '../utils/Constants';
-import {getLastBill} from '../utils/helpers';
 
 export enum TabTypes {
   'BillPayment' = 'Bill Payment',
@@ -63,10 +61,6 @@ const AddTransactionScreen = ({navigation}: any) => {
           const trxnAmount = parseInt(formValues.amountReceived, 10);
           const balanceAmount: number =
             clientDetails[0].amountBalance - trxnAmount;
-
-          console.log('client Balance', clientDetails);
-          console.log({trxnAmount});
-          console.log(balanceAmount);
 
           if (!isNaN(balanceAmount)) {
             await updateForm(
@@ -170,7 +164,7 @@ const AddTransactionScreen = ({navigation}: any) => {
             accessibilityLabel="Mode of payment"
             placeholder="Mode of payment"
             _selectedItem={{
-              bg: 'teal.600',
+              bg: '#cdcdcd',
               endIcon: <CheckIcon size="5" />,
             }}
             mt={1}
@@ -245,6 +239,6 @@ const styles = StyleSheet.create({
     fontWeight: 700,
   },
   activeTab: {
-    backgroundColor: '#008DDA',
+    backgroundColor: '#0175FF',
   },
 });

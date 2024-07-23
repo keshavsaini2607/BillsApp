@@ -106,6 +106,6 @@ const styles = StyleSheet.create({
     fontWeight: 700,
   },
   activeTab: {
-    backgroundColor: '#008DDA',
+    backgroundColor: '#0175FF',
   },
 });

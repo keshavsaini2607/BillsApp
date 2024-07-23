@@ -5,6 +5,7 @@ import AddBillScreen from '../screens/AddBillScreen';
 import AddClientScreen from '../screens/AddClientScreen';
 import TransactionScreen from '../screens/TransactionScreen';
 import AddTransactionScreen from '../screens/AddTransactionScreen';
+import ClientDetailsScreen from '../screens/ClientDetailsScreen';
 
 const Stack = createStackNavigator();
 
@@ -16,6 +17,7 @@ const HomeStack = () => {
       <Stack.Screen name="AddClient" component={AddClientScreen} />
       <Stack.Screen name="Transaction" component={TransactionScreen} />
       <Stack.Screen name="AddTransaction" component={AddTransactionScreen} />
+      <Stack.Screen name="ClientDetails" component={ClientDetailsScreen} />
     </Stack.Navigator>
   );
 };
